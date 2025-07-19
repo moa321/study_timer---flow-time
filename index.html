@@ -1,0 +1,171 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <meta charset="UTF-8">
+  <title>B . PI . E</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #a59999;
+      padding: 50px;
+    }
+    button {
+      padding: 10px 20px;
+      background: rgb(99, 82, 82);  
+      font-size: 18px;
+      margin: 10px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      transition: .2s;
+    }
+    #output {
+      margin-top: 30px;
+      font-size: 24px;
+    }
+    #timer {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 72px;
+      color: #00FFD1;
+      background: #1A1A1A; 
+      padding: 25px 45px;
+      border-radius: 20px;
+      border: 2px solid #00FFD1;
+      text-align: center;
+      width: fit-content;
+      margin: 20px auto;
+      box-shadow: 0 0 5px #00FFD1, 
+                  0 0 15px #00FFD1, 
+                  0 0 30px #00FFD1,
+                  inset 0 0 5px #00FFD1;
+      text-shadow: 0 0 5px #00FFD1, 0 0 10px #00FFD1;
+      animation: pulse 2s infinite alternate;
+    }
+    @keyframes pulse {
+      from {
+        box-shadow: 0 0 5px #00FFD1, 
+                    0 0 15px #00FFD1, 
+                    0 0 30px #00FFD1,
+                    inset 0 0 5px #00FFD1;
+      }
+      to {
+        box-shadow: 0 0 10px #00FFD1, 
+                    0 0 30px #00FFD1, 
+                    0 0 60px #00FFD1,
+                    inset 0 0 10px #00FFD1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>⏱️ System: Study = Break</h1>
+
+  <button onclick="startStudy()">Start Studying</button>
+  <button onclick="pauseStudy()">Pause</button>
+  <button onclick="resumeStudy()">Resume</button>
+  <button onclick="resetStudy()">Reset</button>
+  <button onclick="endStudy()">Finish Studying</button>
+
+  <div id="timer">00:00</div>
+  <div id="output"></div>
+
+  <script>
+    let studyStartTime;
+    let breakTimer;
+    let studyInterval;
+    let totalSeconds = 0;
+    let isPaused = false;
+
+    function updateTimerDisplay() {
+      const min = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
+      const sec = String(totalSeconds % 60).padStart(2, '0');
+      document.getElementById("timer").textContent = `${min}:${sec}`;
+    }
+
+    function startStudy() {
+      if (studyInterval) return; 
+      studyStartTime = new Date();
+      isPaused = false;
+      studyInterval = setInterval(() => {
+        if (!isPaused) {
+          totalSeconds++;
+          updateTimerDisplay();
+        }
+      }, 1000);
+      document.getElementById("output").textContent = "📚 Study session started... Stay focused!";
+    }
+
+
+    function pauseStudy() {
+      isPaused = true;
+      document.getElementById("output").textContent = "⏸️ Study paused.";
+    }
+
+    function resumeStudy() {
+      if (studyInterval && isPaused) {
+        isPaused = false;
+        document.getElementById("output").textContent = "▶️ Resumed studying.";
+      }
+    }
+
+    function resetStudy() {
+      clearInterval(studyInterval);
+      clearInterval(breakTimer); 
+      studyInterval = null;
+      breakTimer = null;
+      totalSeconds = 0;
+      updateTimerDisplay();
+      document.getElementById("output").textContent = "🔄 Study timer reset.";
+    }
+
+ 
+    function endStudy() {
+      if (!totalSeconds) {
+        alert("Please start the study session first!");
+        return;
+      }
+
+      clearInterval(studyInterval);
+      studyInterval = null;
+
+      const minutesStudied = Math.floor(totalSeconds / 60);
+
+      const breakMinutes = Math.floor(minutesStudied * .20); 
+
+      document.getElementById("output").innerHTML = `✅ You studied for <strong>${minutesStudied}</strong> minutes.<br>🛋️ Your break time: <strong>${breakMinutes}</strong> minutes.`;
+
+      if (breakMinutes > 0) {
+        startBreak(breakMinutes);
+      }
+      
+      totalSeconds = 0;
+      
+    }
+
+    function startBreak(minutes) {
+        let seconds = minutes * 60;
+        const timerDisplay = document.getElementById("timer");
+        const output = document.getElementById("output");
+
+        breakTimer = setInterval(() => {
+            if (seconds < 0) {
+                clearInterval(breakTimer);
+                output.innerHTML += "<br>🔔 Break is over! Get back to studying 💪";
+                timerDisplay.textContent = "00:00";
+                return;
+            }
+
+            const min = String(Math.floor(seconds / 60)).padStart(2, '0');
+            const sec = String(seconds % 60).padStart(2, '0');
+
+            timerDisplay.textContent = `${min}:${sec}`;
+            seconds--;
+        }, 1000);
+    }
+  </script>
+</body>
+</html>
